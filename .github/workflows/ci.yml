@@ -34,3 +34,10 @@ jobs:
         run: mvn clean package
         # 'clean' apaga arquivos de build anteriores
         # 'package' compila e empacota em um arquivo .jar (sem rodar testes se não existirem)
+
+      - name: Notificar Teams
+        if: always()
+        run: |
+          curl -H 'Content-Type: application/json' -d '{
+            "text": "Pipeline CI/CD rodou no branch ${{ github.ref }} com status ${{ job.status }}"
+          }' ${{ secrets.TEAMS_WEBHOOK_URL }}
