@@ -35,10 +35,11 @@ jobs:
         # 'clean' apaga arquivos de build anteriores
         # 'package' compila e empacota em um arquivo .jar (sem rodar testes se não existirem)
 
-      - name: Notificar Teams - Adaptive Card
-        if: always()
+      - name: Notificar Teams - Pull Request
+        # Esta condição verifica se o evento que disparou o workflow é um 'pull_request'
+        if: github.event_name == 'pull_request'
         env:
-          COMMIT_MSG: ${{ github.event.head_commit.message || github.event.pull_request.title || 'Mensagem indisponível' }}
+          COMMIT_MSG: ${{ github.event.pull_request.title || 'Mensagem indisponível' }} # Para PRs, o título do PR é mais relevante
         run: |
           curl -H 'Content-Type: application/json' -d '{
             "type": "message",
@@ -53,7 +54,71 @@ jobs:
                   "body": [
                     {
                       "type": "TextBlock",
-                      "text": "📣 **Pipeline CI/CD**",
+                      "text": "📣 **Pipeline CI - Pull Request**",
+                      "wrap": true
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "📁 Repositório: ${{ github.repository }}",
+                      "wrap": true
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "🙋‍♂️ Autor: ${{ github.actor }}",
+                      "wrap": true
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "📝 PR Título: '"$COMMIT_MSG"'", # Alterado para "PR Título"
+                      "wrap": true
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "🔀 Branch: ${{ github.head_ref }}", # Para PR, use head_ref para a branch de origem
+                      "wrap": true
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "🚦 Status: ${{ job.status }}",
+                      "wrap": true
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "🔗 Link PR: ${{ github.event.pull_request.html_url }}", # Link direto para o PR
+                      "wrap": true
+                    },
+                     {
+                      "type": "TextBlock",
+                      "text": "🔗 Link Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+                      "wrap": true
+                    }
+                  ]
+                }
+              }
+            ]
+          }' ${{ secrets.TEAMS_WEBHOOK_URL }}
+
+      - name: Notificar Teams - Merge (Push)
+        # Esta condição verifica se o evento é um 'push' E se ele foi para a branch principal (ex: 'main' ou 'master')
+        # Ajuste 'main' para a sua branch principal, se for diferente
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message || 'Mensagem indisponível' }} # Para push, a mensagem do commit é mais relevante
+        run: |
+          curl -H 'Content-Type: application/json' -d '{
+            "type": "message",
+            "attachments": [
+              {
+                "contentType": "application/vnd.microsoft.card.adaptive",
+                "contentUrl": null,
+                "content": {
+                  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                  "type": "AdaptiveCard",
+                  "version": "1.0",
+                  "body": [
+                    {
+                      "type": "TextBlock",
+                      "text": "✅ **Pipeline CI - Merge (Push para Main)**",
                       "wrap": true
                     },
                     {
@@ -73,7 +138,7 @@ jobs:
                     },
                     {
                       "type": "TextBlock",
-                      "text": "🔀 Branch: ${{ github.head_ref || github.ref_name }}",
+                      "text": "🔀 Branch: ${{ github.ref_name }}", # Para push, ref_name é a branch de destino
                       "wrap": true
                     },
                     {
@@ -83,9 +148,13 @@ jobs:
                     },
                     {
                       "type": "TextBlock",
-                      "text": "🔗 Link: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+                      "text": "🔗 Link Commit: ${{ github.event.head_commit.url }}", # Link direto para o commit
                       "wrap": true
-          
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "🔗 Link Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+                      "wrap": true
                     }
                   ]
                 }
