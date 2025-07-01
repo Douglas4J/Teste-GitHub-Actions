@@ -50,7 +50,7 @@ jobs:
                   "body": [
                     {
                       "type": "TextBlock",
-                      "text": "📣 **Pipeline CI**",
+                      "text": "📣 **Pipeline CI - GitHub Actions**",
                       "wrap": true
                     },
                     {
