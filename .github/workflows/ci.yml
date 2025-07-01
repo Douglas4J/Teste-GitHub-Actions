@@ -35,9 +35,17 @@ jobs:
         # 'clean' apaga arquivos de build anteriores
         # 'package' compila e empacota em um arquivo .jar (sem rodar testes se não existirem)
 
-      - name: Notificar Teams
+      - name: Notificar Teams com Action pronta
         if: always()
-        run: |
-          curl -H 'Content-Type: application/json' -d '{
-            "text": "Pipeline CI/CD rodou no branch ${{ github.ref }} com status ${{ job.status }}"
-          }' ${{ secrets.TEAMS_WEBHOOK_URL }}
+        uses: skitionek/notify-microsoft-teams@v1
+        with:
+          webhook_url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          message: |
+            📣 *CI Notificação do GitHub Actions*
+
+            📁 Repositório: `${{ github.repository }}`
+            🙋‍♂️ Autor do PR: `${{ github.actor }}`
+            📝 Commit: `${{ github.event.head_commit.message || 'PR sem commit direto' }}`
+            🔀 Branch: `${{ github.head_ref || github.ref_name }}`
+            🟢 Status: `${{ job.status }}`
+            🔗 [Ver workflow no GitHub](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
