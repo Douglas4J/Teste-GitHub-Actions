@@ -1,1 +1,1 @@
-# Implementando CI/CD com GitHub Actions
+# Implementação GitHub Actions para Pipeline CI
