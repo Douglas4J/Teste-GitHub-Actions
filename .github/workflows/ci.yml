@@ -50,7 +50,7 @@ jobs:
                   "body": [
                     {
                       "type": "TextBlock",
-                      "text": "📣 **Pipeline CI**",
+                      "text": "📣 **Pipeline CI - GitHub Actions - PULL REQUEST**",
                       "wrap": true
                     },
                     {
@@ -88,4 +88,4 @@ jobs:
                 }
               }
             ]
-          }' ${{ secrets.TEAMS_WEBHOOK_URL }}
+          }' ${{ secrets.GITHUBACTIONS }}
