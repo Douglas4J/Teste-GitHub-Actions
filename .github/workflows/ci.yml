@@ -41,5 +41,5 @@ jobs:
           COMMIT_MSG: ${{ github.event.head_commit.message || github.event.pull_request.title || 'Mensagem indisponível' }}
         run: |
           curl -H 'Content-Type: application/json' -d '{
-            "text": "📣 Pipeline CI/CD\\n📁 Repositório: ${{ github.repository }}\\n🙋‍♂️ Autor: ${{ github.actor }}\\n📝 Commit: '"$COMMIT_MSG"'\\n🔀 Branch: ${{ github.head_ref || github.ref_name }}\\n🚦 Status: ${{ job.status }}\\n🔗 Link: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            "text": "📣 *Pipeline CI/CD*\\n📁 Repositório: '${{ github.repository }}'\\n🙋‍♂️ Autor: '${{ github.actor }}'\\n📝 Commit: '"$COMMIT_MSG"'\\n🔀 Branch: '${{ github.head_ref || github.ref_name }}'\\n🚦 Status: '${{ job.status }}'\\n🔗 Link: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'"
           }' ${{ secrets.TEAMS_WEBHOOK_URL }}
