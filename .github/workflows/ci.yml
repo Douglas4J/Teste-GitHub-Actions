@@ -1,0 +1,36 @@
+# Nome do workflow que aparecerá na aba "Actions" do GitHub
+name: Java Teste CI
+
+# Define em quais eventos esse pipeline será acionado
+on:
+  # Quando houver um push na branch "main"
+  push:
+    branches: [ main ]
+  # Quando houver uma pull request direcionada à branch "main"
+  pull_request:
+    branches: [ main ]
+
+# Define os jobs (tarefas) que serão executados
+jobs:
+  build: # Nome do job (você pode mudar para algo como "compilar-java" se quiser)
+    # Define que o job será executado em um runner Linux (Ubuntu)
+    runs-on: ubuntu-latest
+
+    steps:
+      # Etapa 1: Faz o checkout do código-fonte no repositório
+      - name: Checkout do código
+        uses: actions/checkout@v3
+        # Essa ação clona o código do seu repositório no runner (máquina do GitHub)
+
+      # Etapa 2: Configura o Java 24 no ambiente do runner
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'   # Temurin = build do OpenJDK mantido pela Eclipse Foundation
+          java-version: '24'        # Versão do Java (OpenJDK 24)
+
+      # Etapa 3: Gera o .jar com Maven
+      - name: Build e empacotar .jar com Maven
+        run: mvn clean package
+        # 'clean' apaga arquivos de build anteriores
+        # 'package' compila e empacota em um arquivo .jar (sem rodar testes se não existirem)
