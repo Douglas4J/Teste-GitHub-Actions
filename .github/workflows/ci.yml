@@ -35,11 +35,60 @@ jobs:
         # 'clean' apaga arquivos de build anteriores
         # 'package' compila e empacota em um arquivo .jar (sem rodar testes se não existirem)
 
-      - name: Notificar Teams
+      - name: Notificar Teams - Adaptive Card
         if: always()
         env:
           COMMIT_MSG: ${{ github.event.head_commit.message || github.event.pull_request.title || 'Mensagem indisponível' }}
         run: |
           curl -H 'Content-Type: application/json' -d '{
-            "text": "📣 *Pipeline CI/CD*\\n📁 Repositório: '${{ github.repository }}'\\n🙋‍♂️ Autor: '${{ github.actor }}'\\n📝 Commit: '"$COMMIT_MSG"'\\n🔀 Branch: '${{ github.head_ref || github.ref_name }}'\\n🚦 Status: '${{ job.status }}'\\n🔗 Link: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'"
+            "type": "message",
+            "attachments": [
+              {
+                "contentType": "application/vnd.microsoft.card.adaptive",
+                "contentUrl": null,
+                "content": {
+                  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                  "type": "AdaptiveCard",
+                  "version": "1.0",
+                  "body": [
+                    {
+                      "type": "TextBlock",
+                      "text": "📣 **Pipeline CI/CD**",
+                      "wrap": true
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "📁 Repositório: ${{ github.repository }}",
+                      "wrap": true
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "🙋‍♂️ Autor: ${{ github.actor }}",
+                      "wrap": true
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "📝 Commit: '"$COMMIT_MSG"'",
+                      "wrap": true
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "🔀 Branch: ${{ github.head_ref || github.ref_name }}",
+                      "wrap": true
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "🚦 Status: ${{ job.status }}",
+                      "wrap": true
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "🔗 Link: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+                      "wrap": true
+          
+                    }
+                  ]
+                }
+              }
+            ]
           }' ${{ secrets.TEAMS_WEBHOOK_URL }}
