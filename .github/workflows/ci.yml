@@ -35,29 +35,15 @@ jobs:
         # 'clean' apaga arquivos de build anteriores
         # 'package' compila e empacota em um arquivo .jar (sem rodar testes se não existirem)
 
-      - name: Notificar Teams via curl
+      - name: Notificar Teams
         if: always()
         run: |
-          MESSAGE=$(cat <<EOF
-          {
-            "text": "**📣 Notificação CI/CD GitHub Actions**\n\n\
-          📁 Repositório: ${GITHUB_REPOSITORY}\n\
-          🙋‍♂️ Autor: ${GITHUB_ACTOR}\n\
-          📝 Commit: ${COMMIT_MESSAGE}\n\
-          🔀 Branch: ${BRANCH_NAME}\n\
-          🚦 Status: ${STATUS}\n\
-          🔗 Ver execução: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
-          }
-          EOF
-          )
-          
-          curl -H 'Content-Type: application/json' \
-            -d "$MESSAGE" \
-            ${{ secrets.TEAMS_WEBHOOK_URL }}
-          env:
-            GITHUB_REPOSITORY: ${{ github.repository }}
-            GITHUB_ACTOR: ${{ github.actor }}
-            COMMIT_MESSAGE: ${{ github.event.head_commit.message || github.event.pull_request.title || 'Mensagem indisponível' }}
-            BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-            STATUS: ${{ job.status }}
-            GITHUB_RUN_ID: ${{ github.run_id }}
+          curl -H 'Content-Type: application/json' -d '{
+            "text": "📣 *Pipeline CI/CD*\n
+        📁 Repositório: ${{ github.repository }}\n
+        🙋‍♂️ Autor: ${{ github.actor }}\n
+        📝 Commit: ${{ github.event.head_commit.message || github.event.pull_request.title || \"Mensagem indisponível\" }}\n
+        🔀 Branch: ${{ github.head_ref || github.ref_name }}\n
+        🚦 Status: ${{ job.status }}\n
+        🔗 Link: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }' ${{ secrets.TEAMS_WEBHOOK_URL }}
